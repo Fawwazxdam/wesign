@@ -1,0 +1,22 @@
+# IDE & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Production & Dependency Folders
+**/node_modules/
+**/vendor/
+**/dist/
+**/storage/*.key
+**/.phpunit.result.cache
+
+# Environment Files (SANGAT PENTING)
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Docker Data (Jika kamu buat folder database lokal)
+docker/db_data/

@@ -1,0 +1,11 @@
+services:                # Daftar layanan/container yang mau dijalankan
+  app-web:               # Nama bebas untuk container pertama kita
+    image: nginx:alpine  # Mengambil image web server Nginx versi ringan (alpine)
+    ports:
+      - "8080:80"        # [Port Laptop kita] : [Port di dalam Container]
+                         # Jadi kalau kita buka localhost:8080, dia nyambung ke nginx
+  
+  database:              # Container kedua
+    image: postgres:15-alpine
+    environment:         # Settingan awal (seperti install database biasa)
+      POSTGRES_PASSWORD: adamfh

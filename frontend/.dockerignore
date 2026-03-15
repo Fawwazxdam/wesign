@@ -1,0 +1,19 @@
+# Dependency
+node_modules
+npm-debug.log
+
+# Build output
+dist
+build
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Misc
+.git
+.gitignore
+.vscode
+.env.local
+.env.*.local
+DS_Store
