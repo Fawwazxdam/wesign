@@ -2,31 +2,38 @@ services:
   # Backend (Laravel)
   backend:
     build:
-      context: ./backend
+      context: ./backend/wesign-api
       dockerfile: Dockerfile
-    container_name: wesign-backend
+    container_name: wesign-api
     restart: unless-stopped
     tty: true
-    working_dir: /var/www
+    working_dir: /var/www/wesign-api
     volumes:
       - ./backend:/var/www
     networks:
       - wesign-network
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql_db
+    command: "/bin/sh -c 'php artisan serve --host=0.0.0.0 --port=8000'"
 
   # Frontend (Vue + Vite)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: wesign-frontend
+    container_name: wesign
     restart: unless-stopped
-    ports:
-      - "5173:5173"
+    tty: true
+    working_dir: /app/wesign
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend/wesign:/app/wesign
+      - /app/wesign/node_modules
     networks:
       - wesign-network
+    ports:
+      - "5173:5173"
 
   # Database (MySQL)
   mysql_db:
@@ -35,7 +42,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: wesign
-      MYSQL_ROOT_PASSWORD: 
+      MYSQL_ROOT_PASSWORD: toor
     volumes:
       - ./docker/db_data:/var/lib/mysql
     networks:
