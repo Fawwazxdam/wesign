@@ -1,5 +1,22 @@
+# =============================================================================
+# Docker Compose Configuration
+# =============================================================================
+# Konfigurasi orchestration untuk container: Backend (Laravel), Frontend (Vue), dan Database (MySQL)
+#
+# Untuk menjalankan:
+#   docker-compose up -d --build
+#
+# Catatan:
+#   - Credentials database dipindahkan ke docker/.env untuk keamanan
+#   - MySQL menggunakan healthcheck untuk memastikan database siap sebelum backend start
+# =============================================================================
+
 services:
-  # Backend (Laravel)
+  # Backend (Laravel PHP)
+  # ---------------------------------------------------------------------
+  # Menjalankan aplikasi Laravel dengan PHP 8.3 FPM
+  # Port: 8000 (http://localhost:8000)
+  # ---------------------------------------------------------------------
   backend:
     build:
       context: ./backend/wesign-api
@@ -7,18 +24,36 @@ services:
     container_name: wesign-api
     restart: unless-stopped
     tty: true
+    # Working directory di dalam container
     working_dir: /var/www/wesign-api
+    # Mount volume untuk hot-reload saat development
+    # Perubahan kode di host akan langsung terlihat di container
     volumes:
       - ./backend:/var/www
     networks:
       - wesign-network
+    # Expose port 8000 ke host
     ports:
       - "8000:8000"
+    # ---------------------------------------------------------------------
+    # depends_on dengan condition: service_healthy
+    # Backend TIDAK akan start sampai MySQL benar-benar ready (healthcheck pass)
+    # Ini mengatasi masalah "Laravel start sebelum MySQL siap"
+    # ---------------------------------------------------------------------
     depends_on:
-      - mysql_db
+      mysql_db:
+        condition: service_healthy
+    # Override CMD dari Dockerfile untuk memastikan binding ke 0.0.0.0
     command: "/bin/sh -c 'php artisan serve --host=0.0.0.0 --port=8000'"
+    # Environment variables dari .env file
+    env_file:
+      - docker/.env
 
-  # Frontend (Vue + Vite)
+  # Frontend (Vue.js + Vite)
+  # ---------------------------------------------------------------------
+  # Menjalankan Vue.js development server dengan Vite
+  # Port: 5173 (http://localhost:5173)
+  # ---------------------------------------------------------------------
   frontend:
     build:
       context: ./frontend
@@ -28,26 +63,67 @@ services:
     tty: true
     working_dir: /app/wesign
     volumes:
+      # Mount source code untuk hot-reload
       - ./frontend/wesign:/app/wesign
+      # Named volume untuk node_modules agar tidak tertimpa oleh mount
+      # Ini adalah best practice: source code di-mount, tapi dependency di-keep
       - /app/wesign/node_modules
     networks:
       - wesign-network
     ports:
       - "5173:5173"
+    # Environment variables dari .env file
+    env_file:
+      - docker/.env
 
-  # Database (MySQL)
+  # Database (MySQL 8.0)
+  # ---------------------------------------------------------------------
+  # Menjalankan MySQL untuk menyimpan data aplikasi
+  # Tidak ada port yang di-expose ke host (hanya bisa diakses dari container lain)
+  # ---------------------------------------------------------------------
   mysql_db:
     image: mysql:8.0
     container_name: wesign-db
     restart: unless-stopped
+    # ---------------------------------------------------------------------
+    # Environment variables untuk konfigurasi MySQL
+    # Diambil dari docker/.env untuk konsistensi dan keamanan
+    # ---------------------------------------------------------------------
     environment:
-      MYSQL_DATABASE: wesign
-      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: ${DB_DATABASE:-wesign}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-toor}
+      # MYSQL_USER dan MYSQL_PASSWORD opsional - bisa ditambahkan jika diperlukan
+    # Volume untuk persistent storage
+    # Data MySQL akan tersimpan di ./docker/db_data di host
+    # Bahkan setelah container di-hapus, data tetap aman
     volumes:
       - ./docker/db_data:/var/lib/mysql
     networks:
       - wesign-network
+    # ---------------------------------------------------------------------
+    # HEALTHCHECK untuk MySQL
+    # ---------------------------------------------------------------------
+    # healthcheck memastikan MySQL benar-benar siap menerima koneksi
+    # sebelum container lain bergantung padanya
+    healthcheck:
+      # Perintah yang dijalankan untuk memeriksa kesehatan
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-toor}"]
+      # Interval: cek setiap 10 detik
+      interval: 10s
+      # Timeout: dianggap failed jika tidak selesai dalam 5 detik
+      timeout: 5s
+      # Retry: coba 5 kali sebelum menganggap unhealthy
+      retries: 5
+      # Start period: tunggu 30 detik pertama kali sebelum mulai healthcheck
+      # Ini memberi waktu untuk MySQL melakukan initial setup
+      start_period: 30s
 
+# =============================================================================
+# Network Configuration
+# =============================================================================
+# Bridge network agar semua container bisa saling berkomunikasi
+# Menggunakan driver bridge (default) untuk komunikasi antar container
+# =============================================================================
 networks:
   wesign-network:
     driver: bridge
