@@ -48,6 +48,7 @@ services:
     # Environment variables dari .env file
     env_file:
       - docker/.env
+      # - backend/wesign-api/.env
 
   # Frontend (Vue.js + Vite)
   # ---------------------------------------------------------------------

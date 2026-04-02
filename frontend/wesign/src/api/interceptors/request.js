@@ -1,25 +1,33 @@
-const setupRequestInterceptor = (apiClient) => {
-  apiClient.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("access_token");
+import { addRequestInterceptor } from '../client'
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+const setupRequestInterceptor = () => {
+    addRequestInterceptor(
+        (config) => {
+            const token = localStorage.getItem("access_token");
 
-      if (config.method == "get") {
-        config.params = {
-          ...config.params,
-          _t: Date.now(),
-        };
-      }
+            if (token) {
+                config.headers = {
+                    ...config.headers,
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            } else {
+                config.headers = {
+                    ...config.headers,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }
 
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    },
-  );
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
+        }
+    );
 };
 
 export default setupRequestInterceptor;

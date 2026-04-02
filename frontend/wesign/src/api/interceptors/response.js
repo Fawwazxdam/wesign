@@ -1,16 +1,17 @@
 import router from '@/router'
 import { useToast } from 'vue-toastification'
+import { addResponseInterceptor } from '../client'
 
-const setupResponseInterceptor = (apiClient) => {
-    apiClient.interceptors.response.use(
-        response => {
+const setupResponseInterceptor = () => {
+    addResponseInterceptor(
+        (response) => {
             document.body.classList.remove('loading')
-
-            return response.data
+            return response
         },
-        async error => {
+        async (error) => {
             document.body.classList.remove('loading')
 
+            // Error from our custom fetch wrapper
             if (error.response) {
                 const status = error.response.status
 
@@ -25,7 +26,8 @@ const setupResponseInterceptor = (apiClient) => {
                 } else if (status >= 500) {
                     useToast().showError('Terjadi kesalahan pada server. Silakan coba lagi nanti.')
                 } else {
-                    useToast().showError(error.response.data.message || 'Terjadi kesalahan. Silakan coba lagi.')
+                    const message = error.response.data?.message || 'Terjadi kesalahan. Silakan coba lagi.'
+                    useToast().showError(message)
                 }
             } else {
                 useToast().showError('Tidak dapat terhubung ke server. Silakan periksa koneksi internet Anda.')
