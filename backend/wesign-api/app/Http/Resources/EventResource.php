@@ -24,6 +24,8 @@ class EventResource extends JsonResource
             'description' => $this->description,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'participants' => ParticipantResource::collection($this->whenLoaded('participants')),
+            'participant_count' => $this->whenLoaded('participants', fn() => $this->participants->count()),
         ];
     }
 }

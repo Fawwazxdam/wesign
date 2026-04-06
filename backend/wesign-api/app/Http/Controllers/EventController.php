@@ -82,6 +82,9 @@ class EventController extends Controller
     public function show(Event $event)
     {
         try {
+            // Eager load participants for detail view
+            $event->load('participants');
+            
             return response()->json([
                 'message' => 'Event retrieved successfully',
                 'data' => new EventResource($event),
