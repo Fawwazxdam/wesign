@@ -1,6 +1,8 @@
-import { toast } from 'vue-toastification'
+import { useToast as useToastOriginal } from 'vue-toastification'
 
 export function useToast() {
+  const toast = useToastOriginal()
+
   const showSuccess = (message) => {
     toast.success(message)
   }

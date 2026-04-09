@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Calendar, MapPin, Clock, Users, ArrowLeft, Loader2, Edit, Trash2, UserCheck, UserX } from "lucide-vue-next";
+import { Calendar, MapPin, Clock, Users, ArrowLeft, Loader2, Edit, Trash2, UserCheck, UserX, Link, Copy, Check } from "lucide-vue-next";
 import { eventsApi } from "@/api/modules/event";
 import { handleApiError } from "@/api/utils/error-handler";
 import Modal from "@/components/Modal.vue";
@@ -15,8 +15,26 @@ const apiError = ref(null);
 const event = ref(null);
 const participants = ref([]);
 const showDeleteModal = ref(false);
+const copied = ref(false);
 
 const eventId = route.params.id;
+
+const registerLink = computed(() => {
+  const baseUrl = window.location.origin;
+  return `${baseUrl}/events/${eventId}/register`;
+});
+
+const copyRegisterLink = async () => {
+  try {
+    await navigator.clipboard.writeText(registerLink.value);
+    copied.value = true;
+    setTimeout(() => {
+      copied.value = false;
+    }, 2000);
+  } catch (error) {
+    console.error("Error copying link:", error);
+  }
+};
 
 const statusOptions = [
   { value: "upcoming", label: "Akan Datang", color: "bg-blue-100 text-blue-700" },
@@ -109,6 +127,21 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <!-- Copy Register Link -->
+        <div class="relative group">
+          <button
+            @click="copyRegisterLink"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+          >
+            <Copy v-if="!copied" class="h-4 w-4" />
+            <Check v-else class="h-4 w-4 text-green-600" />
+            {{ copied ? 'Tersalin' : 'Salin Link Pendaftaran' }}
+          </button>
+          <!-- Tooltip -->
+          <div class="absolute right-0 mt-2 w-64 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+            {{ registerLink }}
+          </div>
+        </div>
         <button
           @click="goToEdit"
           class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"

@@ -36,6 +36,11 @@ export const eventsApi = {
     return apiClient.post(`/events/${eventId}/register`, data)
   },
 
+  // PUBLIC: Get ticket by qr_code
+  getTicketByQrCode(qrCode) {
+    return apiClient.get(`/tickets/${qrCode}`)
+  },
+
   // Duplicate event
   duplicate(id) {
     return apiClient.post(`/events/${id}/duplicate`)

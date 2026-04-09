@@ -85,7 +85,7 @@ async function fetchWithInterceptors(url, options = {}) {
     // Build fetch options
     const fetchOptions = {
         method: modifiedConfig.method,
-        headers: modifiedConfig.headers,
+        headers: { ...modifiedConfig.headers },
     }
     
     // Add body for non-GET requests
@@ -94,6 +94,7 @@ async function fetchWithInterceptors(url, options = {}) {
             fetchOptions.body = modifiedConfig.body
         } else {
             fetchOptions.body = JSON.stringify(modifiedConfig.body)
+            fetchOptions.headers['Content-Type'] = 'application/json'
         }
     }
     

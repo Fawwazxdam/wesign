@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { ArrowLeft, Calendar, MapPin, Clock, Loader2, Save } from "lucide-vue-next";
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Clock,
+  Loader2,
+  Save,
+} from "lucide-vue-next";
 import { eventsApi } from "@/api/modules/event";
 import { handleApiError } from "@/api/utils/error-handler";
 
@@ -81,7 +88,10 @@ const goBack = () => {
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <button @click="goBack" class="p-2 hover:bg-gray-100 rounded-lg transition">
+        <button
+          @click="goBack"
+          class="p-2 hover:bg-gray-100 rounded-lg transition"
+        >
           <ArrowLeft class="h-5 w-5 text-gray-600" />
         </button>
         <div>
@@ -158,12 +168,18 @@ const goBack = () => {
 
         <!-- Status -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Status</label
+          >
           <select
             v-model="formData.status"
             class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           >
-            <option v-for="option in statusOptions" :key="option.value" :value="option.value">
+            <option
+              v-for="option in statusOptions"
+              :key="option.value"
+              :value="option.value"
+            >
               {{ option.label }}
             </option>
           </select>
@@ -171,7 +187,9 @@ const goBack = () => {
 
         <!-- Description -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Deskripsi</label
+          >
           <textarea
             v-model="formData.description"
             rows="4"
@@ -181,7 +199,9 @@ const goBack = () => {
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+        <div
+          class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100"
+        >
           <button
             type="button"
             @click="goBack"

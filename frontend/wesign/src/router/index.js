@@ -9,6 +9,9 @@ import EventIndex from "@/views/events/index.vue";
 import EventAdd from "@/views/events/add.vue";
 import EventDetail from "@/views/events/detail.vue";
 import EventEdit from "@/views/events/edit.vue";
+import EventRegister from "@/views/register/register.vue";
+import EventTicket from "@/views/register/ticket.vue";
+import VerifyTicket from "@/views/register/verify-ticket.vue";
 
 const routes = [
     { path: "/", name: "Home", component: Home },
@@ -22,6 +25,10 @@ const routes = [
     { path: "/events/add", name: "EventAdd", component: EventAdd, meta: { layout: "authenticated" } },
     { path: "/events/:id", name: "EventDetail", component: EventDetail, meta: { layout: "authenticated" } },
     { path: "/events/:id/edit", name: "EventEdit", component: EventEdit, meta: { layout: "authenticated" } },
+    
+    { path: "/events/:id/register", name: "EventRegister", component: EventRegister },
+    { path: "/tickets/:qr_code", name: "EventTicket", component: EventTicket },
+    { path: "/cek-ticket", name: "VerifyTicket", component: VerifyTicket },
 ];
 
 const router = createRouter({

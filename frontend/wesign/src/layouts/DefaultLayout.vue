@@ -7,7 +7,7 @@ import Header from "@/components/Header.vue";
   <div class="min-h-screen flex flex-col">
     <Header />
 
-    <main class="mx-auto">
+    <main class="">
       <!-- SLOT DI SINI -->
       <slot />
     </main>
